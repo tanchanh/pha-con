@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Lượng Nước Cần Để Pha Cồn - D.T.Chánh</title>
+    <style>
+        :root {
+            /* Bộ màu chủ đạo màu Đỏ Tím/Magenta hoàng gia quý phái */
+            --primary: #A00A5A;
+            --primary-hover: #C21876;
+            --primary-light: #FCEBF3;
+            --bg-start: #FAF5F8;
+            --card-border: #E5D0DC;
+            --text-main: #3A0320;
+            --input-bg: #ffffff;
+            --error-bg: #FFF0F2;
+            --error-border: #D32F2F;
+            --error-text: #7B001C;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-start);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: block;
+            padding: 1.5rem 1rem 4rem 1rem;
+            /* Đệm cuối màn hình là 4rem */
+            max-width: 40rem;
+            margin: 0 auto;
+            width: 100%;
+            transition: background var(--transition-speed) ease, color var(--transition-speed) ease;
+            font-weight: normal;
+            font-size: 1.1rem;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 0.25rem;
+            color: var(--primary);
+            transition: color var(--transition-speed) ease;
+        }
+
+        /* Tên tác giả dưới tiêu đề h1 theo quy tắc */
+        .author-tag {
+            font-style: normal;
+            /* font-style: normal */
+            font-size: 1.2rem;
+            /* font-size: 1.2rem */
+            text-align: right;
+            /* căn phải */
+            color: #000000;
+            /* màu đen */
+            margin-bottom: 1.5rem;
+            font-weight: normal;
+        }
+
+
+        /* Không sử dụng card Container giới hạn chiều rộng thu nhỏ để tăng không gian hiển thị trên điện thoại */
+        .container {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Form nhập liệu & kết quả */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            /* >= 600 -> bold */
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            /* >= 600 -> bold */
+            border: 2px solid var(--card-border);
+            /* Viền dày 2px */
+            border-radius: 0.5rem;
+            /* Bo tròn góc viền 0.5rem */
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color var(--transition-speed) ease, background-color var(--transition-speed) ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+        }
+
+        .result-box {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 1rem;
+            border: 2px solid var(--card-border);
+            border-radius: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            transition: all var(--transition-speed) ease;
+            min-height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2rem;
+            /* Thêm khoảng cách 2rem trước ô kết quả */
+        }
+
+        .result-box.error {
+            background-color: var(--error-bg);
+            border-color: var(--error-border);
+            color: var(--error-text);
+        }
+
+        .error-message {
+            color: var(--error-border);
+            font-size: 0.9rem;
+            margin-top: -1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: bold;
+            /* >= 600 -> bold */
+        }
+
+        .error-message:empty {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Tính Lượng Nước Cần Để Pha Cồn</h1>
+        <div class="author-tag">D.T.Chánh</div>
+
+        <div class="input-group">
+            <label for="C1">Nồng Độ Cồn Ban Đầu (%):</label>
+            <input type="number" id="C1" value="96" min="1" max="100" step="1">
+        </div>
+        <div class="input-group">
+            <label for="C2">Nồng Độ Cồn Sau Khi Pha (%):</label>
+            <input type="number" id="C2" value="70" min="1" max="100" step="1">
+        </div>
+        <div class="error-message" id="concentrationError"></div>
+
+        <div class="input-group">
+            <label for="V1">Thể Tích Ban Đầu (ml):</label>
+            <input type="number" id="V1" placeholder="Nhập thể tích ban đầu..." min="0" step="100">
+        </div>
+        <div class="input-group">
+            <label for="V2">Thể Tích Sau Khi Pha (ml):</label>
+            <input type="number" id="V2" placeholder="Nhập thể tích sau khi pha..." min="0" step="100">
+        </div>
+        <div class="error-message" id="volumeError"></div>
+
+        <div class="result-box">
+            <span id="result">Lượng nước cần thêm (ml): 0</span>
+        </div>
+    </div>
+
+    <script>
+        // Lấy các phần tử DOM
+        const C1Input = document.getElementById('C1');
+        const C2Input = document.getElementById('C2');
+        const V1Input = document.getElementById('V1');
+        const V2Input = document.getElementById('V2');
+        const resultSpan = document.getElementById('result');
+        const resultBox = document.querySelector('.result-box');
+        const concentrationError = document.getElementById('concentrationError');
+        const volumeError = document.getElementById('volumeError');
+
+        // Hàm để tính toán và cập nhật kết quả
+        const calculateAndDisplay = () => {
+            let C1 = parseFloat(C1Input.value);
+            let C2 = parseFloat(C2Input.value);
+            const V1 = parseFloat(V1Input.value);
+            const V2 = parseFloat(V2Input.value);
+
+            // Xóa thông báo lỗi cũ
+            concentrationError.textContent = '';
+            volumeError.textContent = '';
+            resultBox.classList.remove('error');
+
+            // --- KIỂM TRA ĐIỀU KIỆN NỒNG ĐỘ (C1, C2) ---
+            if (C1 <= 0 || C2 <= 0) {
+                concentrationError.textContent = 'Nồng độ phải lớn hơn 0.';
+                resultSpan.textContent = 'Lượng nước cần thêm (ml): ---';
+                resultBox.classList.add('error');
+                return;
+            }
+
+            // Điều kiện C2 phải nhỏ hơn C1
+            if (C2 >= C1) {
+                concentrationError.textContent = 'Nồng độ sau khi pha phải nhỏ hơn nồng độ ban đầu.';
+                resultSpan.textContent = 'Lượng nước cần thêm (ml): ---';
+                resultBox.classList.add('error');
+                return;
+            }
+
+            let calculatedV1, calculatedV2, V3;
+            let isValid = false;
+
+            // Nếu người dùng nhập V1, tính V2 và V3
+            if (V1Input.value !== '' && !isNaN(V1) && V1 > 0) {
+                calculatedV2 = (V1 * C1) / C2;
+                V3 = calculatedV2 - V1;
+                V2Input.value = calculatedV2.toFixed(0);
+                isValid = true;
+            }
+            // Nếu người dùng nhập V2, tính V1 và V3
+            else if (V2Input.value !== '' && !isNaN(V2) && V2 > 0) {
+                calculatedV1 = (V2 * C2) / C1;
+                V3 = V2 - calculatedV1;
+                V1Input.value = calculatedV1.toFixed(0);
+                isValid = true;
+            } else {
+                V1Input.value = '';
+                V2Input.value = '';
+            }
+
+            // Kiểm tra điều kiện V1 phải nhỏ hơn V2 theo quy tắc
+            if (isValid && parseFloat(V1Input.value) >= parseFloat(V2Input.value)) {
+                volumeError.textContent = 'Thể tích ban đầu (V1) phải nhỏ hơn thể tích sau khi pha (V2).';
+                resultSpan.textContent = 'Lượng nước cần thêm (ml): ---';
+                resultBox.classList.add('error');
+                return;
+            }
+
+            if (isValid) {
+                const roundedV3 = V3.toFixed(0);
+                resultSpan.textContent = `Lượng nước cần thêm (ml): ${roundedV3}`;
+            } else {
+                resultSpan.textContent = 'Lượng nước cần thêm (ml): ---';
+            }
+        };
+
+        // Thêm trình lắng nghe sự kiện 'input' cho tất cả các trường
+        [C1Input, C2Input, V1Input, V2Input].forEach(input => {
+            input.addEventListener('input', (event) => {
+                // Chỉ cho phép một trong hai trường V1 hoặc V2 có giá trị
+                if (event.target.id === 'V1' && V1Input.value !== '') {
+                    V2Input.value = '';
+                } else if (event.target.id === 'V2' && V2Input.value !== '') {
+                    V1Input.value = '';
+                }
+                calculateAndDisplay();
+            });
+        });
+
+        // Cập nhật kết quả ban đầu
+        calculateAndDisplay();
+    </script>
+</body>
+
+</html>
